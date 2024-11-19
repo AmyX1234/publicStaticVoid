@@ -4,7 +4,14 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -19,6 +26,19 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  private Joystick controller = new Joystick(0);
+
+  // Motors initialized here
+  TalonFX myMotor = new TalonFX(1);
+  TalonFX primaryMotor = new TalonFX(2);
+  TalonFX followerMotor1 = new TalonFX(3);
+  TalonFX followerMotor2 = new TalonFX(4);
+
+  TalonFX leftMotor = new TalonFX(5);
+  TalonFX rightMotor = new TalonFX(6);
+
+
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -28,6 +48,43 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    // Motors are setup here
+    // Reset the motor to its factory default configuration
+    myMotor.getConfigurator().apply(new TalonFXConfiguration());
+    primaryMotor.getConfigurator().apply(new TalonFXConfiguration());
+    followerMotor1.getConfigurator().apply(new TalonFXConfiguration());
+    followerMotor2.getConfigurator().apply(new TalonFXConfiguration());
+    leftMotor.getConfigurator().apply(new TalonFXConfiguration());
+    rightMotor.getConfigurator().apply(new TalonFXConfiguration());
+
+    /* Configure the current of the motor. */
+    var currentConfiguration = new CurrentLimitsConfigs();
+    currentConfiguration.StatorCurrentLimit = 80;
+    currentConfiguration.StatorCurrentLimitEnable = true;
+
+    /* Refreshing and then applying the current configuration.*/
+    myMotor.getConfigurator().refresh(currentConfiguration);
+    primaryMotor.getConfigurator().refresh(currentConfiguration);
+    followerMotor1.getConfigurator().refresh(currentConfiguration);
+    followerMotor2.getConfigurator().refresh(currentConfiguration);
+    leftMotor.getConfigurator().refresh(currentConfiguration);
+    rightMotor.getConfigurator().refresh(currentConfiguration);
+
+    myMotor.getConfigurator().apply(currentConfiguration);
+    primaryMotor.getConfigurator().apply(currentConfiguration);
+    followerMotor1.getConfigurator().apply(currentConfiguration);
+    followerMotor2.getConfigurator().apply(currentConfiguration);
+    leftMotor.getConfigurator().apply(currentConfiguration);
+    rightMotor.getConfigurator().apply(currentConfiguration);
+
+    /* Configure the follower motors */
+    followerMotor1.setControl(new Follower(2, false));
+    followerMotor2.setControl(new Follower(2, false));
+
+    rightMotor.setInverted(true);
+
+    //SmartDashboard.putString("First Printout", "Hello World!");
   }
 
   /**
@@ -44,6 +101,18 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    /* Live readout of the primary motor's percent out */
+    SmartDashboard.putNumber("Primary Motor % Out", primaryMotor.get());
+
+    /* Live readout of the primary motor's voltage */
+    SmartDashboard.putNumber("Primary Motor Voltage", primaryMotor.getMotorVoltage().getValueAsDouble());
+
+    SmartDashboard.putBoolean("Joystick 0 A button", controller.getRawButton(1));
+
+    SmartDashboard.putNumber("Joystick 0 Right x Axis", controller.getRawAxis(0));
+
+    
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -81,7 +150,22 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+    /* Motors do stuff here. */
+    myMotor.set(0.5);
+   // primaryMotor.set(0.5);
+
+   if (controller.getRawButton(1)){
+    primaryMotor.set(0.5);
+   } else{
+    primaryMotor.set(0);
+   }
+   
+   // leftMotor.set(controller.getRawAxis(0));
+   // rightMotor.set(controller.getRawAxis(0));
+
+  }
 
   @Override
   public void testInit() {
