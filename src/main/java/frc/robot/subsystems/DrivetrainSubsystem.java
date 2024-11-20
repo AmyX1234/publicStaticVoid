@@ -19,7 +19,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void setSpeed(float speed){
+  public void setSpeed(double speed){
     motor.set(speed);
+    
   }
+
+
 }
