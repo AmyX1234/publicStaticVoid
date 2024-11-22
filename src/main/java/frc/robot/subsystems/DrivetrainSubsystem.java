@@ -10,7 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 public class DrivetrainSubsystem extends SubsystemBase {
   /** Creates a new DrivetrainSubsystem. */
 
-  private final WPI_TalonSRX motor = new WPI_TalonSRX(0);
+  private final WPI_TalonSRX motor = new WPI_TalonSRX(6);
 
   public DrivetrainSubsystem() {}
 
